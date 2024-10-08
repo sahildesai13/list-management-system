@@ -1,6 +1,7 @@
 // src/LayoutClient.tsx
 "use client";
 
+import Footer from "@/components/layouts/Footer";
 import { Header } from "@/components/layouts/Header";
 import React from "react";
 
@@ -14,7 +15,7 @@ export default function LayoutClient({ children }) {
             </header>
             <main>{children}</main>
             <footer>
-                <h1>Footer</h1>
+               <Footer/>
             </footer>
         </div>
     );
