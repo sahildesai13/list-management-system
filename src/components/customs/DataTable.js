@@ -33,21 +33,16 @@ export function DataTable() {
   const fetchData = async () => {
     try {
       const response = await apiClient('/api/items'); // Adjust the endpoint as necessary
-
-      // Check if response has an error or no data
-      if (response.error || !response.data || response.data.length === 0) {
-        // Update Redux store with an empty array to clear the data
-        dispatch(addData([]));
-        toast({ description: "No items found." });
+      if (!response) {
+        toast({ variant: "destructive" , description: "No items found." });
       } else {
-        dispatch(addData(response.data)); // Update the Redux store with new data
+        dispatch(addData(response));
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       toast({ description: "Failed to fetch data." });
     }
   };
-
 
   const handleDrawerOpen = (id, ele) => {
     setOpenDrawerId(id);
@@ -86,21 +81,18 @@ export function DataTable() {
 
     try {
       const response = await apiClient(`/api/items/${itemId}`, { method: 'DELETE' });
-      if (response.success) { // Check if deletion was successful
+      if (response) { 
+        console.log("Item deleted successfully:", response);
         toast({ description: "Item deleted successfully!" });
-        fetchData(); // Fetch updated data
+        fetchData(); 
       } else {
-        toast({ description: response.message || "Failed to delete item." });
+        toast({ description: JSON.parse(response).message || "Failed to delete item." });
       }
     } catch (error) {
       console.error("Failed to delete item:", error);
       toast({ description: "Error deleting item." });
     }
   };
-
-  useEffect(() => {
-    fetchData(); // Fetch initial data on component mount
-  }, []);
 
   return (
     <div className="bg-border p-5 rounded-md shadow-2xl">
@@ -112,19 +104,17 @@ export function DataTable() {
             <TableHead>id</TableHead>
             <TableHead>Item Name</TableHead>
             <TableHead>size</TableHead>
-            <TableHead>DB id</TableHead>
             <TableHead>Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length > 0 ? (
+          {data?.length > 0 ? (
             data.map((ele, ind) => (
               <React.Fragment key={ind}>
                 <TableRow onClick={() => handleDrawerOpen(ind, ele)}>
                   <TableCell>{ind + 1}</TableCell>
                   <TableCell>{ele.ItemName}</TableCell>
                   <TableCell>{ele.size}</TableCell>
-                  <TableCell>{ele._id}</TableCell>
                   <TableCell>
                     <Button
                       onClick={(event) => callApiDelete({ itemId: ele._id, event })}
